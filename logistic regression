@@ -1,0 +1,44 @@
+# Import necessary libraries
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import LabelEncoder
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import accuracy_score, confusion_matrix, classification_report
+
+# Step 1: Load the dataset
+data = pd.read_csv('breast_cancer_data.csv')
+
+# Step 2: Preprocess the data
+# Drop the 'id' column as it's not useful for prediction
+data.drop(columns=['id'], inplace=True)
+
+# Convert the 'diagnosis' column to numeric: 'M' = 1, 'B' = 0
+label_encoder = LabelEncoder()
+data['diagnosis'] = label_encoder.fit_transform(data['diagnosis'])
+
+# Separate the features (X) from the target (y)
+X = data.drop(columns=['diagnosis'])  # All columns except 'diagnosis'
+y = data['diagnosis']  # The target variable (0 = Benign, 1 = Malignant)
+
+# Step 3: Split the data into training and testing sets (80% train, 20% test)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Step 4: Initialize and train the logistic regression model
+logreg = LogisticRegression(max_iter=10000)  # Set max_iter high enough for convergence
+logreg.fit(X_train, y_train)
+
+# Step 5: Make predictions on the test data
+y_pred = logreg.predict(X_test)
+
+# Step 6: Evaluate the model's performance
+# Accuracy Score
+accuracy = accuracy_score(y_test, y_pred)
+print(f"Accuracy: {accuracy:.4f}")
+
+# Confusion Matrix
+conf_matrix = confusion_matrix(y_test, y_pred)
+print(f"Confusion Matrix:\n{conf_matrix}")
+
+# Classification Report
+class_report = classification_report(y_test, y_pred)
+print(f"Classification Report:\n{class_report}")
